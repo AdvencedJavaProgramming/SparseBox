@@ -1,3 +1,4 @@
+#import <AppKit/AppKit.h>
 @import Foundation;
 @import Darwin;
 @import MachO;
