@@ -24,6 +24,7 @@ struct ContentView: View {
     @State var initError: String?
     @State var lastError: String?
     @State var path = NavigationPath()
+    @State var showFilePicker = false
     var body: some View {
         NavigationStack(path: $path) {
             Form {
@@ -132,6 +133,18 @@ struct ContentView: View {
                         applyChanges()
                     }
                     .disabled(taskRunning)
+                    Button("Load MobileGestalt file") {
+                        showFilePicker.toggle()
+                    }
+                    .fileImporter(isPresented: $showFilePicker, allowedContentTypes: [.data]) { result in
+                        switch result {
+                        case .success(let url):
+                            loadMobileGestaltFile(from: url)
+                        case .failure(let error):
+                            lastError = error.localizedDescription
+                            showErrorAlert.toggle()
+                        }
+                    }
                 } footer: {
                     VStack {
                         Text("""
@@ -416,5 +429,15 @@ Thanks to:
         let requiredVersion = major*10000 + minor*100 + patch
         let currentVersion = os.majorVersion*10000 + os.minorVersion*100 + os.patchVersion
         return currentVersion < requiredVersion
+    }
+    
+    func loadMobileGestaltFile(from url: URL) {
+        do {
+            try FileManager.default.copyItem(at: url, to: modMGURL)
+            mobileGestalt = try NSMutableDictionary(contentsOf: modMGURL, error: ())
+        } catch {
+            lastError = "Failed to load MobileGestalt file: \(error)"
+            showErrorAlert.toggle()
+        }
     }
 }
