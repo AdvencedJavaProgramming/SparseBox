@@ -2,17 +2,42 @@
 @import Darwin;
 @import MachO;
 
+void loadMobileGestaltFileFromUser() {
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseFiles:YES];
+    [openPanel setCanChooseDirectories:NO];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setAllowedFileTypes:@[@"plist"]];
+
+    if ([openPanel runModal] == NSModalResponseOK) {
+        NSURL *selectedFileURL = [openPanel URL];
+        if (selectedFileURL) {
+            NSError *error = nil;
+            NSData *fileData = [NSData dataWithContentsOfURL:selectedFileURL options:0 error:&error];
+            if (fileData) {
+                NSString *filePath = [selectedFileURL path];
+                [NSUserDefaults.standardUserDefaults setObject:filePath forKey:@"MobileGestaltFilePath"];
+            } else {
+                NSLog(@"Failed to load MobileGestalt file: %@", error);
+            }
+        }
+    }
+}
+
 __attribute__((constructor)) void FindCacheDataOffset() {
-    /*
-     * TL;DR: finding CacheData value offset is as follows:
-     * - Get a pointer to the corresponding obfuscated key in libMobileGestalt
-     * - Get a pointer to an unknown struct, whose first pointer is the pointer to the obfuscated key
-     * - Offset it by 0x9a (FIXME this lol), read it as uint16_t
-     * - Shift left the resulting offset by 3 bits
-     */
+    NSString *mobileGestaltFilePath = [NSUserDefaults.standardUserDefaults stringForKey:@"MobileGestaltFilePath"];
+    if (!mobileGestaltFilePath) {
+        loadMobileGestaltFileFromUser();
+        mobileGestaltFilePath = [NSUserDefaults.standardUserDefaults stringForKey:@"MobileGestaltFilePath"];
+    }
+
+    if (!mobileGestaltFilePath) {
+        NSLog(@"MobileGestalt file not loaded. Exiting.");
+        return;
+    }
 
     const struct mach_header_64 *header = NULL;
-    const char *mgName = "/usr/lib/libMobileGestalt.dylib";
+    const char *mgName = [mobileGestaltFilePath UTF8String];
     const char *mgKey = "mtrAoWJ3gsq+I90ZnQ0vQw";
     dlopen(mgName, RTLD_GLOBAL);
 
