@@ -1,3 +1,4 @@
+#import <Cocoa/Cocoa.h>
 #import <AppKit/AppKit.h>
 @import Foundation;
 @import Darwin;
