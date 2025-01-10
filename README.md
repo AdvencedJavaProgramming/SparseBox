@@ -1,7 +1,7 @@
 # SparseBox
 
 On-device backup restoration?
-
+- manual mobilegestalt
 - [x] rewrote SparseRestore to swift
 
 ## Installation
