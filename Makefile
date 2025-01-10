@@ -15,7 +15,7 @@ libEMProxy_INSTALL_PATH = /Applications/$(APPLICATION_NAME).app/Frameworks
 
 # libimobiledevice + minimuxer
 libimobiledevice_FILES = idevicebackup2.c FindCacheDataOffset.m
-libimobiledevice_CFLAGS = -Iinclude -fobjc-arc
+libimobiledevice_CFLAGS = -Iinclude -fobjc-arc -F /System/Library/Frameworks
 libimobiledevice_LDFLAGS = \
   -force_load lib/libimobiledevice-1.0.a \
   -force_load lib/libimobiledevice-glue-1.0.a \
@@ -25,7 +25,8 @@ libimobiledevice_LDFLAGS = \
   -force_load lib/libssl.a \
   -force_load lib/libminimuxer-ios.a \
   -Wl,-mllvm,--opaque-pointers \
-  -install_name @rpath/libimobiledevice.dylib
+  -install_name @rpath/libimobiledevice.dylib \
+  -framework Cocoa
 libimobiledevice_FRAMEWORKS = Foundation Security SystemConfiguration
 libimobiledevice_INSTALL_PATH = /Applications/$(APPLICATION_NAME).app/Frameworks
 
