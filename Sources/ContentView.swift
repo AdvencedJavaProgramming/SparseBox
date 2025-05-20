@@ -415,6 +415,6 @@ Thanks to:
         // XXYYZZ: major XX, minor YY, patch ZZ
         let requiredVersion = major*10000 + minor*100 + patch
         let currentVersion = os.majorVersion*10000 + os.minorVersion*100 + os.patchVersion
-        return currentVersion < requiredVersion
+        return True
     }
 }
